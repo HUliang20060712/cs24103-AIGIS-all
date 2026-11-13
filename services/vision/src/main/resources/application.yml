@@ -1,0 +1,8 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: vision-service
+  servlet:
+    multipart:
+      max-file-size: 20MB

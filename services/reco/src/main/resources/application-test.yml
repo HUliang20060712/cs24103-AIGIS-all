@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:15432/aigis_test
+    username: aigis
+    password: aigis_test
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6380
+      database: 2
+# 网关 test 入口 8082

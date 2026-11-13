@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/aigis
+    username: aigis
+    password: aigis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+logging:
+  level:
+    cn.edu.chzu.aigis.reco: debug
+# 网关 dev 入口 8081

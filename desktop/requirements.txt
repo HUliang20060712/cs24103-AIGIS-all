@@ -1,0 +1,12 @@
+# AIGIS 桌面端依赖（不随包提供，需自行安装）
+# 实验一阶段仅做骨架，以下为实验四编码时的目标依赖
+torch>=2.5.0
+torchvision>=0.20.0
+opencv-python>=4.5.0
+numpy>=1.26.0
+PyYAML>=6.0
+# GUI（实验四）
+PyQt5>=5.15.0
+# 测试
+pytest>=8.0.0
+pytest-cov>=5.0.0

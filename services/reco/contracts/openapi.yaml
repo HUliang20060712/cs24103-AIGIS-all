@@ -1,0 +1,108 @@
+openapi: 3.0.3
+info:
+  title: AIGIS B-推荐系统 API
+  version: 0.3.0
+  description: P03 AIGIS 推荐服务契约，M3 冻结；字段变更须走 CR。
+servers:
+  - url: http://127.0.0.1:8083
+paths:
+  /api/reco/feed:
+    get:
+      summary: 获取用户推荐流 Top-N
+      parameters:
+        - { name: userId, in: query, required: true, schema: { type: integer, format: int64, example: 1001 } }
+        - { name: page, in: query, schema: { type: integer, default: 1, minimum: 1 } }
+        - { name: size, in: query, schema: { type: integer, default: 10, minimum: 1, maximum: 50 } }
+      responses:
+        '200':
+          description: 推荐列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page: { type: integer }
+                  size: { type: integer }
+                  total: { type: integer }
+                  list:
+                    type: array
+                    items: { $ref: '#/components/schemas/RecoItem' }
+  /api/reco/feedback:
+    post:
+      summary: 上报一次反馈（点击/收藏/不喜欢）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Feedback' }
+      responses:
+        '204': { description: 已记录 }
+  /api/reco/preference/{userId}:
+    get:
+      summary: 查询用户偏好
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: integer, format: int64 } }
+      responses:
+        '200':
+          description: 偏好
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Preference' }
+    put:
+      summary: 覆盖用户偏好
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: integer, format: int64 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Preference' }
+      responses:
+        '200': { description: 已更新 }
+    delete:
+      summary: 清空用户偏好
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: integer, format: int64 } }
+      responses:
+        '204': { description: 已删除 }
+  /api/reco/items/{itemId}/similar:
+    get:
+      summary: 相似物品（内容相似度）
+      parameters:
+        - { name: itemId, in: path, required: true, schema: { type: integer, format: int64 } }
+        - { name: limit, in: query, schema: { type: integer, default: 6, maximum: 20 } }
+      responses:
+        '200':
+          description: 相似物品
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RecoItem' }
+components:
+  schemas:
+    RecoItem:
+      type: object
+      properties:
+        itemId: { type: integer, format: int64 }
+        name: { type: string }
+        category: { type: string, enum: [水体, 植被, 建筑, 道路, 农田, 裸地] }
+        score: { type: number, format: double }
+        reason:
+          type: object
+          properties:
+            type: { type: string, enum: [cf, content, hot] }
+            text: { type: string }
+    Feedback:
+      type: object
+      required: [userId, itemId, action]
+      properties:
+        userId: { type: integer, format: int64 }
+        itemId: { type: integer, format: int64 }
+        action: { type: string, enum: [click, favorite, dislike] }
+    Preference:
+      type: object
+      properties:
+        userId: { type: integer, format: int64 }
+        categories: { type: array, items: { type: string } }
+        weight: { type: number, minimum: 0, maximum: 1 }

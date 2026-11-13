@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: aigis
+      POSTGRES_USER: aigis
+      POSTGRES_PASSWORD: aigis
+    ports: ["15432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+  reco:
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_HOST: redis
+    ports: ["${RECO_PORT:-8083}:8083"]
+    depends_on: [postgres, redis]
+volumes:
+  pgdata:

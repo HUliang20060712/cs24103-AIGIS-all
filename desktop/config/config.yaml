@@ -1,0 +1,29 @@
+# AIGIS 桌面端配置
+app:
+  name: "AIGIS-Segmenter"
+  version: "0.1.0"
+
+environment: dev  # dev | test | prod
+
+model:
+  backbone: "unet"           # unet | mobilenet_unet（CPU降级用）
+  num_classes: 6              # 建筑/植被/水体/道路/裸地/其他
+  input_size: [512, 512]
+  pretrained: true
+  device: "auto"              # auto | cpu | cuda
+
+training:
+  epochs: 50
+  batch_size: 4
+  lr: 0.001
+  val_split: 0.2
+  checkpoint_dir: "checkpoints/"
+
+inference:
+  batch_size: 1
+  overlay_alpha: 0.5
+
+data:
+  sample_dir: "data/samples/"
+  train_dir: "data/processed/train/"
+  val_dir: "data/processed/val/"

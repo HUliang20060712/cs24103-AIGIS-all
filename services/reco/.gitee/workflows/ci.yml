@@ -1,0 +1,57 @@
+# AIGIS 四作业流水线：build-java / build-python / verify / ai-trace
+name: aigis-ci
+
+on:
+  push:
+    branches: [ develop, 'feature/**', 'hotfix/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Compile
+        run: mvn -B -q -DskipTests compile
+
+  build-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax check
+        run: python -m compileall -q tools
+
+  verify:
+    runs-on: ubuntu-latest
+    needs: build-java
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Unit tests
+        run: mvn -B -q test
+      - name: Offline evaluation
+        run: |
+          python3 tools/offline_eval.py
+          python3 -c "import json;m=json.load(open('tools/eval_report.json'));assert m['recall_at_20']>=0.15, m"
+
+  ai-trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require ai-log
+        run: |
+          test -f docs/ai-log/lab1-ai-log.md || { echo "缺少 ai-log，PR 不予合并"; exit 1; }
+          grep -q "A-0" docs/ai-log/lab1-ai-log.md || { echo "ai-log 无有效记录"; exit 1; }

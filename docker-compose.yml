@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16
+    environment: { POSTGRES_DB: aigis, POSTGRES_USER: aigis, POSTGRES_PASSWORD: aigis }
+    ports: ["15432:5432"]
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+  reco:
+    build: ./services/reco
+    ports: ["8083:8083"]
+    depends_on: [postgres, redis]
+  vision:
+    build: ./services/vision
+    ports: ["8084:8084"]
+  gateway:
+    build: ./services/gateway
+    ports: ["8081:8081"]
+    depends_on: [reco, vision]

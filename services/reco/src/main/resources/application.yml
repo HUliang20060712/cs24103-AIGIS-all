@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: reco-service
+  profiles:
+    active: dev
+reco:
+  cf-weight: 0.6
+  content-weight: 0.4
+  cache-ttl-seconds: 300
+  hot-fallback-size: 10
+server:
+  port: 8083
